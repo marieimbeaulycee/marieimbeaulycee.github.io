@@ -1,0 +1,1072 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Canvas by Per & Fred</title>
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-alt: #0f172a;
+      --panel: #111827;
+      --panel-alt: #1f2937;
+      --accent: #38bdf8;
+      --accent-2: #f97316;
+      --accent-soft: #e5f3ff;
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --page-bg: #fdfcfb;
+      --page-text: #111827;
+      --textarea-bg: #f9fafb;
+      --textarea-border: #d1d5db;
+    }
+
+    /* Thème clair */
+    :root[data-theme="light"] {
+      --bg: #f3f4f6;
+      --bg-alt: #e5e7eb;
+      --panel: #ffffff;
+      --panel-alt: #f9fafb;
+      --accent: #2563eb;
+      --accent-2: #ea580c;
+      --accent-soft: #dbeafe;
+      --danger: #b91c1c;
+      --text: #111827;
+      --muted: #6b7280;
+      --page-bg: #ffffff;
+      --page-text: #111827;
+      --textarea-bg: #f9fafb;
+      --textarea-border: #d1d5db;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, var(--bg-alt) 0, var(--bg) 55%);
+      color: var(--text);
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: linear-gradient(90deg, #020617, #111827);
+      color: #e5e7eb;
+      border-bottom: 1px solid #1f2937;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.6);
+    }
+
+    :root[data-theme="light"] header {
+      background: linear-gradient(90deg, #111827, #1f2937);
+    }
+
+    header h1 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 20px;
+      letter-spacing: 0.06em;
+    }
+
+    header h1 span {
+      font-weight: 300;
+      opacity: .9;
+    }
+
+    header .badge {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56,189,248,0.12);
+      color: var(--accent);
+      font-size: 11px;
+      border: 1px solid rgba(56,189,248,0.5);
+    }
+
+    #theme-toggle {
+      margin-left: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.6);
+      color: #e5e7eb;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    :root[data-theme="light"] #theme-toggle {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    main {
+      padding: 14px 16px 20px;
+      display: flex;
+      flex-direction: column;   /* cards l’une sous l’autre */
+      gap: 14px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, var(--panel), rgba(15,23,42,0.92));
+      border-radius: 10px;
+      border: 1px solid rgba(148,163,184,0.35);
+      box-shadow: 0 10px 40px rgba(15,23,42,0.45);
+      overflow: hidden;
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    :root[data-theme="light"] .card {
+      background: var(--panel);
+      box-shadow: 0 8px 24px rgba(15,23,42,0.16);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.25), transparent 60%);
+      border-bottom: 1px solid rgba(148,163,184,0.3);
+      font-size: 13px;
+    }
+
+    .card-header-title {
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+    }
+
+    .chip {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,118,110,0.25);
+      color: #6ee7b7;
+      font-size: 11px;
+      border: 1px solid rgba(34,197,94,0.45);
+    }
+
+    /* Barre d’édition */
+    #toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 8px 10px;
+      background: rgba(15,23,42,0.95);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(30,64,175,0.7);
+    }
+
+    :root[data-theme="light"] #toolbar {
+      background: rgba(243,244,246,0.98);
+      border-bottom-color: rgba(148,163,184,0.7);
+    }
+
+    #toolbar button,
+    #toolbar select {
+      background: rgba(17,24,39,0.95);
+      color: #e5e7eb;
+      border: 1px solid rgba(148,163,184,0.4);
+      border-radius: 5px;
+      padding: 4px 7px;
+      font-size: 12px;
+      cursor: pointer;
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    :root[data-theme="light"] #toolbar button,
+    :root[data-theme="light"] #toolbar select {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    #toolbar button:hover,
+    #toolbar select:hover {
+      background: #0f172a;
+      border-color: var(--accent);
+    }
+
+    :root[data-theme="light"] #toolbar button:hover,
+    :root[data-theme="light"] #toolbar select:hover {
+      background: #e5e7eb;
+    }
+
+    #toolbar button.primary {
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
+      color: #0b1120;
+      border-color: transparent;
+      font-weight: 500;
+    }
+
+    #toolbar button.primary:hover {
+      filter: brightness(1.05);
+    }
+
+    #toolbar .sep {
+      width: 1px;
+      height: 22px;
+      margin: 0 2px;
+      background: rgba(148,163,184,0.4);
+    }
+
+    #toolbar .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+
+    #canvas-shell {
+      padding: 10px 12px 14px;
+      background: radial-gradient(circle at top, rgba(15,118,110,0.28), transparent 55%);
+    }
+
+    :root[data-theme="light"] #canvas-shell {
+      background: radial-gradient(circle at top, rgba(129,140,248,0.22), transparent 55%);
+    }
+
+    #canvas-frame {
+      margin: 0 auto;
+      background: var(--page-bg);
+      color: var(--page-text);
+      width: 92%;
+      min-width: 520px;
+      max-width: 1200px;
+      height: 620px;
+      min-height: 320px;
+      padding: 40px 64px;
+      overflow: auto;
+      resize: both;
+      border-radius: 14px;
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow:
+        0 16px 40px rgba(15,23,42,0.35),
+        0 0 0 1px rgba(148,163,184,0.4);
+    }
+
+    #canvas-title {
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(248,113,113,0.5);
+      color: var(--page-text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #canvas-title small {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #6b7280;
+    }
+
+    #editor {
+      outline: none;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    #editor:empty::before {
+      content: "Collez ici votre texte, vos images, et des fragments de pages web…";
+      color: #9ca3af;
+    }
+
+    #editor img {
+      max-width: 100%;
+      height: auto;
+      cursor: nwse-resize;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.18);
+      border-radius: 4px;
+    }
+
+    .inline-textarea {
+      display: block;
+      width: 100%;
+      min-height: 60px;
+      padding: 6px 8px;
+      margin: 4px 0;
+      font-family: inherit;
+      font-size: 14px;
+      resize: both;
+      border-radius: 6px;
+      border: 1px solid var(--textarea-border);
+      background: var(--textarea-bg);
+    }
+
+    /* Panneau sauvegarde */
+    #io-panel {
+      padding: 10px 12px 14px;
+    }
+
+    #top-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    #top-bar-row1 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #top-bar-row1 label {
+      color: var(--muted);
+    }
+
+    #top-bar-row1 select {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+
+    :root[data-theme="light"] #top-bar-row1 select {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    #status-line {
+      color: var(--muted);
+    }
+
+    .io-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .io-buttons button {
+      flex: 1 1 auto;
+      min-width: 120px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.96);
+      color: #e5e7eb;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    :root[data-theme="light"] .io-buttons button {
+      background: #ffffff;
+      color: #111827;
+    }
+
+    .io-buttons button:hover {
+      background: #020617;
+      border-color: var(--accent-2);
+      color: #e5e7eb;
+    }
+
+    :root[data-theme="light"] .io-buttons button:hover {
+      background: #e5e7eb;
+    }
+
+    .io-buttons button.danger {
+      border-color: rgba(239,68,68,0.8);
+      color: #fecaca;
+      background: rgba(127,29,29,0.75);
+    }
+
+    .io-buttons button.danger:hover {
+      background: rgba(127,29,29,0.95);
+    }
+
+    #ls-info {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    small.kbd {
+      padding: 1px 4px;
+      border-radius: 3px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.8);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    :root[data-theme="light"] small.kbd {
+      background: #f3f4f6;
+    }
+
+    a {
+      color: var(--accent);
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+          integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+<header>
+  <h1>Canvas <span>by Frédéric Rouillé, version 3.3</span></h1>
+  <div>
+    <span class="badge">Experimental editor</span>
+    <button id="theme-toggle" type="button">Thème clair</button>
+  </div>
+</header>
+
+<main>
+  <!-- 1. CARD SAUVEGARDE & EXPORT -->
+  <section class="card">
+    <div class="card-header">
+      <span class="card-header-title">Sauvegarde &amp; export</span>
+      <span style="font-size:11px;color:var(--muted);">Stockage local + téléchargements</span>
+    </div>
+    <div id="io-panel">
+
+      <div id="top-bar">
+        <div id="top-bar-row1">
+          <label for="autosave-interval">Auto‑save dans localStorage :</label>
+          <select id="autosave-interval">
+            <option value="0">Off</option>
+            <option value="30000">30 s</option>
+            <option value="60000" selected>1 min</option>
+            <option value="300000">5 min</option>
+          </select>
+<div style="margin-bottom:8px;font-size:12px;">
+  <label for="save-name-input" style="color:var(--muted);">
+    Nom de base des sauvegardes :
+  </label>
+  <input id="save-name-input" type="text" value="cla_canvas"
+         style="margin-left:6px;padding:3px 6px;font-size:12px;border-radius:4px;border:1px solid #9ca3af;max-width:180px;">
+  <button id="btn-apply-save-name" type="button" style="margin-left:4px;font-size:12px;padding:3px 6px;">
+    Appliquer
+  </button>
+</div>
+
+<div id="current-save-name" style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+  Nom actuel : <strong>cla_canvas</strong>_AAAA-MM-JJ_hh-mm-ss
+</div>
+
+        </div>
+
+        <div id="status-line">Aucune sauvegarde pour l’instant.</div>
+      </div>
+
+      <div class="io-buttons">
+        <button id="btn-save-json">Sauvegarder JSON</button>
+        <button id="btn-restore-json">Restaurer JSON</button>
+        <button id="btn-export-html">Exporter HTML</button>
+        <button id="btn-export-pdf" disabled>-</button>
+  <button id="btn-restore-ls">Restaurer localStorage</button>
+  <button id="btn-clear-ls" class="danger">Clear localStorage</button>
+
+
+      </div>
+
+      <div id="ls-info"></div>
+
+      <input type="file" id="file-input-json" accept="application/json" style="display:none;">
+    </div>
+  </section>
+
+  <!-- 2. CARD EDITION -->
+  <section class="card">
+    <div class="card-header">
+      <span class="card-header-title">Zone d’édition</span>
+      <span class="chip">Rich text + zones à compléter</span>
+    </div>
+
+    <!-- Barre d’outils -->
+    <div id="toolbar">
+      <span class="section-label">Texte</span>
+      <select id="block-format" title="Style de paragraphe">
+        <option value="p">Paragraphe</option>
+        <option value="h1">Titre 1</option>
+        <option value="h2">Titre 2</option>
+        <option value="h3">Titre 3</option>
+      </select>
+
+      <button data-cmd="bold"><b>B</b></button>
+      <button data-cmd="italic"><i>I</i></button>
+      <button data-cmd="underline"><u>U</u></button>
+      <button data-cmd="strikeThrough"><span style="text-decoration:line-through;">S</span></button>
+      <button data-cmd="subscript">indice</sub></button>
+      <button data-cmd="superscript">exposant</sup></button>
+      <button data-cmd="removeFormat">Clear</button>
+<button id="btn-text-color" title="Couleur du texte">🌈</button>
+<button id="btn-highlight" title="Surligneur (couleur de fond)">📝</button>
+
+
+      <button id="btn-undo">↺</button>
+      <button id="btn-redo">↻</button>
+
+      <div class="sep"></div>
+
+      <button data-cmd="insertUnorderedList">• Liste</button>
+      <button data-cmd="insertOrderedList">1. Liste</button>
+      <button data-cmd="outdent">↤</button>
+      <button data-cmd="indent">↦</button>
+
+
+      <div class="sep"></div>
+
+      <span class="section-label">Alignement</span>
+      <button data-cmd="justifyLeft">⯇</button>
+      <button data-cmd="justifyCenter">≡</button>
+      <button data-cmd="justifyRight">⯈</button>
+      <button data-cmd="justifyFull">⟷</button>
+
+      <div class="sep"></div>
+
+      <span class="section-label">Inserts</span>
+      <button id="btn-insert-image" class="primary">Image…</button>
+      <button id="btn-insert-textarea">Zone à compléter</button>
+      <button id="btn-insert-checkbox">Case à cocher</button>
+<button id="btn-table" title="Insérer un tableau">📊</button>
+      <button id="btn-insert-hr">Ligne</button>
+      <button id="btn-insert-link">Lien…</button>
+
+      <div class="sep"></div>
+
+      <small class="kbd">Drag &amp; Drop images, Ctrl+V pour coller</small>
+<small class="kbd">rem : pour le sélecteur de couleur et le surligneur, tapez entrée pour valider votre choix </small>
+    </div>
+
+    <!-- Canvas -->
+    <div id="canvas-shell">
+      <div id="canvas-frame">
+        <div id="canvas-title">
+          <span>Canvas by  @ F.Rouillé -2026</span>
+          <small>Document interactif</small>
+        </div>
+        <div id="editor" contenteditable="true">
+          <p>Collez ici votre texte, vos images, ou faites un glisser‑déposer d’images depuis votre ordinateur.</p>
+          <p>Ajoutez des <em>zones à compléter</em> avec le bouton « Zone à compléter » pour que vos élèves ou collègues puissent écrire directement dans le document.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const root = document.documentElement;
+  root.setAttribute("data-theme", "dark");
+  const themeToggle = document.getElementById("theme-toggle");
+  themeToggle.addEventListener("click", () => {
+    const current = root.getAttribute("data-theme") || "dark";
+    const next = current === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    themeToggle.textContent = next === "dark" ? "Thème clair" : "Thème sombre";
+  });
+
+  const editor = document.getElementById("editor");
+  const statusLine = document.getElementById("status-line");
+  const autosaveSelect = document.getElementById("autosave-interval");
+  let STORAGE_KEY_BASE = "cla_canvas";
+  let autosaveTimer = null;
+
+  function pad(n){return String(n).padStart(2,"0");}
+  function formatDateForKey(d){
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+
+           "_"+pad(d.getHours())+"-"+pad(d.getMinutes())+"-"+pad(d.getSeconds());
+  }
+
+  function updateLocalStorageInfo() {
+    try {
+      let used = 0;
+      for (let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        used += (localStorage.getItem(k) || "").length;
+      }
+      const kb = (used/1024).toFixed(1);
+      document.getElementById("ls-info").textContent =
+        "Espace utilisé estimé : "+kb+" Ko (limite typique ≈ 5 Mo).";
+    } catch {
+      document.getElementById("ls-info").textContent = "localStorage non disponible.";
+    }
+  }
+
+//======================================================================
+// --- Gestion du nom de base pour les fichiers / clés ---
+const saveNameInput = document.getElementById("save-name-input");
+const applySaveNameBtn = document.getElementById("btn-apply-save-name");
+const currentSaveNameLabel = document.getElementById("current-save-name");
+
+function refreshCurrentSaveNameLabel() {
+  currentSaveNameLabel.innerHTML =
+    'Nom actuel : <strong>' + STORAGE_KEY_BASE +
+    '</strong>_AAAA-MM-JJ_hh-mm-ss';
+}
+
+applySaveNameBtn.addEventListener("click", () => {
+  const val = (saveNameInput.value || "").trim();
+  if (!val) {
+    alert("Le nom ne peut pas être vide.");
+    return;
+  }
+  STORAGE_KEY_BASE = val;
+  refreshCurrentSaveNameLabel();
+  statusLine.textContent = 'Nouveau nom de base pour les sauvegardes : ' + STORAGE_KEY_BASE;
+});
+
+// init à l’ouverture
+refreshCurrentSaveNameLabel();
+
+
+//=======================================================================
+// Restaurer un contenu depuis localStorage (clés commençant par STORAGE_KEY_BASE)
+document.getElementById("btn-restore-ls").addEventListener("click", () => {
+  const candidates = [];
+
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(STORAGE_KEY_BASE)) {
+        candidates.push(k);
+      }
+    }
+  } catch (e) {
+    alert("Impossible de lire localStorage.");
+    return;
+  }
+
+  if (!candidates.length) {
+    alert('Aucune sauvegarde trouvée dans localStorage pour "' + STORAGE_KEY_BASE + '".');
+    return;
+  }
+
+  // Tri alphabétique (donc aussi chronologique si tu as suffixe date/heure)
+  candidates.sort();
+
+  const choice = prompt(
+    "Choisissez l’index de la sauvegarde à restaurer :\n" +
+    candidates
+      .map((k, idx) => idx + " : " + k)
+      .join("\n")
+  );
+
+  if (choice === null) return;
+  const idx = parseInt(choice, 10);
+  if (isNaN(idx) || idx < 0 || idx >= candidates.length) {
+    alert("Index invalide.");
+    return;
+  }
+
+  const key = candidates[idx];
+  try {
+    const raw = localStorage.getItem(key);
+    const data = JSON.parse(raw || "{}");
+    if (!data.html) {
+      alert("Données invalides pour la clé sélectionnée.");
+      return;
+    }
+    editor.innerHTML = data.html;
+    statusLine.textContent = "Contenu restauré depuis localStorage : " + key;
+  } catch (e) {
+    alert("Erreur lors de la restauration depuis localStorage.");
+  }
+});
+
+
+//===================================================================
+
+  // Commandes texte
+  document.querySelectorAll("#toolbar button[data-cmd]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const cmd = btn.getAttribute("data-cmd");
+      document.execCommand(cmd, false, null);
+      editor.focus();
+    });
+  });
+
+  document.getElementById("block-format").addEventListener("change", e => {
+    const tag = e.target.value;
+    document.execCommand("formatBlock", false, tag);
+    editor.focus();
+  });
+
+  // Undo / Redo
+  document.getElementById("btn-undo").addEventListener("click", () => {
+    document.execCommand("undo", false, null);
+    editor.focus();
+  });
+  document.getElementById("btn-redo").addEventListener("click", () => {
+    document.execCommand("redo", false, null);
+    editor.focus();
+  });
+
+  // Insertion textarea
+  document.getElementById("btn-insert-textarea").addEventListener("click", () => {
+    const textareaHTML = '<textarea class="inline-textarea" placeholder="À compléter…"></textarea>';
+    document.execCommand("insertHTML", false, textareaHTML);
+    editor.focus();
+  });
+
+  // Insertion checkbox
+  document.getElementById("btn-insert-checkbox").addEventListener("click", () => {
+    const html = '<label><input type="checkbox" /> </label>';
+    document.execCommand("insertHTML", false, html);
+    editor.focus();
+  });
+
+  // Insertion lien, hr, image
+  document.getElementById("btn-insert-link").addEventListener("click", () => {
+    const url = prompt("Adresse du lien :");
+    if (url) document.execCommand("createLink", false, url);
+  });
+
+  document.getElementById("btn-insert-hr").addEventListener("click", () => {
+    document.execCommand("insertHorizontalRule");
+  });
+
+  document.getElementById("btn-insert-image").addEventListener("click", () => {
+    const url = prompt("Adresse de l’image (laisser vide pour choisir un fichier) :");
+    if (url) {
+      document.execCommand("insertImage", false, url);
+      return;
+    }
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.execCommand("insertImage", false, ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    });
+    input.click();
+  });
+
+// Changement de couleur du texte - VERSION CORRIGÉE
+//===================================================
+document.getElementById("btn-text-color").addEventListener("click", () => {
+  // Activer le mode CSS pour éviter les balises <font>
+  document.execCommand("styleWithCSS", false, true);
+  
+  // Créer le sélecteur de couleur
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = "#000000";
+  
+  input.onchange = (e) => {
+    const color = e.target.value;
+    // Utilise hiliteColor pour l'arrière-plan ET foreColor pour le texte
+    document.execCommand("foreColor", false, color);
+    editor.focus();
+  };
+  
+  input.click();
+});
+
+//========================================================
+// Surligneur (couleur de fond du texte sélectionné)
+//========================================================
+document.getElementById("btn-highlight").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = "#ffff00"; // Jaune par défaut pour surligner
+  
+  input.onchange = (e) => {
+    const color = e.target.value;
+    document.execCommand("hiliteColor", false, color);
+    editor.focus();
+  };
+  
+  input.click();
+});
+
+
+// Changement de couleur du texte
+//==================================================
+document.getElementById("btn-text-color").addEventListener("click", () => {
+  // ... code couleur existant
+});
+
+// 👇 AJOUTE CE NOUVEAU CODE ICI
+// Surligneur (couleur de fond du texte sélectionné)
+document.getElementById("btn-highlight").addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "color";
+  input.value = "#ffff00"; // Jaune par défaut pour surligner
+  
+  input.onchange = (e) => {
+    const color = e.target.value;
+    document.execCommand("hiliteColor", false, color);
+    editor.focus();
+  };
+  
+  input.click();
+});
+
+
+//====================================================================
+// Insertion d'un tableau
+document.getElementById("btn-table").addEventListener("click", () => {
+  const rows = prompt("Nombre de lignes (ex: 3) :", "3");
+  const cols = prompt("Nombre de colonnes (ex: 4) :", "4");
+  
+  if (!rows || !cols || isNaN(rows) || isNaN(cols) || rows < 1 || cols < 1) {
+    alert("Veuillez entrer des nombres valides (minimum 1)");
+    return;
+  }
+  
+  let tableHTML = '<table style="border-collapse: collapse; width: 100%; margin: 8px 0;">';
+  
+  // Lignes d'en-tête
+  tableHTML += '<tr>';
+  for (let i = 0; i < cols; i++) {
+    tableHTML += '<th style="border: 1px solid #ccc; padding: 8px; background: #f3f4f6; text-align: left;">En-tête</th>';
+  }
+  tableHTML += '</tr>';
+  
+  // Lignes de données
+  for (let i = 0; i < rows; i++) {
+    tableHTML += '<tr>';
+    for (let j = 0; j < cols; j++) {
+      tableHTML += '<td style="border: 1px solid #ccc; padding: 8px;">Cellule</td>';
+    }
+    tableHTML += '</tr>';
+  }
+  
+  tableHTML += '</table>';
+  
+  document.execCommand("insertHTML", false, tableHTML);
+  editor.focus();
+});
+
+//=====================================================================
+  // Images redimensionnables
+  let currentImg = null, startX, startY, startW, startH;
+  editor.addEventListener("mousedown", e => {
+    if (e.target.tagName === "IMG") {
+      currentImg = e.target;
+      startX = e.clientX;
+      startY = e.clientY;
+      startW = currentImg.offsetWidth;
+      startH = currentImg.offsetHeight;
+      document.addEventListener("mousemove", onImgResize);
+      document.addEventListener("mouseup", stopImgResize);
+      e.preventDefault();
+    }
+  });
+  function onImgResize(e){
+    if (!currentImg) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const w = Math.max(40, startW + dx);
+    const h = Math.max(40, startH + dy);
+    currentImg.style.width = w + "px";
+    currentImg.style.height = h + "px";
+  }
+  function stopImgResize(){
+    document.removeEventListener("mousemove", onImgResize);
+    document.removeEventListener("mouseup", stopImgResize);
+    currentImg = null;
+  }
+
+  // Drag & Drop d’images
+  editor.addEventListener("dragover", e => {
+    e.preventDefault();
+  });
+  editor.addEventListener("drop", e => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (!files || !files.length) return;
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        document.execCommand("insertImage", false, ev.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Collage d’images depuis le presse-papiers
+  editor.addEventListener("paste", e => {
+    const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items || [];
+    for (const item of items) {
+      if (item.type && item.type.indexOf("image") !== -1) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          document.execCommand("insertImage", false, ev.target.result);
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+    }
+  });
+
+  // Autosave localStorage
+  function doAutosave() {
+    try {
+      const now = new Date();
+      const key = "cla_canvas" + "_" + formatDateForKey(now);
+      const data = { date: now.toISOString(), html: editor.innerHTML };
+      localStorage.setItem(key, JSON.stringify(data));
+      statusLine.textContent = "Auto‑save → " + key;
+      updateLocalStorageInfo();
+    } catch {
+      statusLine.textContent = "Erreur de sauvegarde dans localStorage.";
+    }
+  }
+
+  function startAutosave(interval) {
+    if (autosaveTimer) clearInterval(autosaveTimer);
+    if (interval > 0) {
+      autosaveTimer = setInterval(doAutosave, interval);
+      statusLine.textContent = "Auto‑save activé toutes les " + (interval/1000) + " s.";
+    } else {
+      statusLine.textContent = "Auto‑save désactivé.";
+    }
+  }
+
+  autosaveSelect.addEventListener("change", e => {
+    const val = parseInt(e.target.value, 10) || 0;
+    startAutosave(val);
+  });
+
+  startAutosave(parseInt(autosaveSelect.value, 10) || 0);
+  updateLocalStorageInfo();
+
+  // Clear localStorage
+  document.getElementById("btn-clear-ls").addEventListener("click", () => {
+    if (!confirm('Supprimer toutes les clés "cla_canvas" dans localStorage ?')) return;
+    try {
+      const toDelete = [];
+      for (let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if (k && k.startsWith(STORAGE_KEY_BASE)) toDelete.push(k);
+      }
+      toDelete.forEach(k => localStorage.removeItem(k));
+      statusLine.textContent = "Clés \"cla_canvas\" supprimées.";
+      updateLocalStorageInfo();
+    } catch {
+      alert("Erreur lors du nettoyage du localStorage.");
+    }
+  });
+
+  // Sauvegarder JSON
+  document.getElementById("btn-save-json").addEventListener("click", () => {
+    const now = new Date();
+    const filename = STORAGE_KEY_BASE + "_" + formatDateForKey(now) + ".json";
+    const data = { date: now.toISOString(), html: editor.innerHTML };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    statusLine.textContent = "Fichier JSON téléchargé : " + filename;
+  });
+
+  // Restaurer JSON
+  const fileInputJson = document.getElementById("file-input-json");
+  document.getElementById("btn-restore-json").addEventListener("click", () => {
+    fileInputJson.value = "";
+    fileInputJson.click();
+  });
+
+  fileInputJson.addEventListener("change", e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data && data.html) {
+          editor.innerHTML = data.html;
+          statusLine.textContent = "Contenu restauré depuis " + file.name;
+        } else {
+          alert("Fichier JSON invalide.");
+        }
+      } catch {
+        alert("Impossible de lire ce fichier JSON.");
+      }
+    };
+    reader.readAsText(file, "utf-8");
+  });
+
+  // Export HTML avec bouton PDF intégré
+  document.getElementById("btn-export-html").addEventListener("click", () => {
+    const now = new Date();
+    const filenameBase = STORAGE_KEY_BASE + "_" + formatDateForKey(now);
+    const filename = filenameBase + ".html";
+    const escapedHtml = editor.innerHTML;
+
+    const fullHtml =
+      "<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n" +
+      "<meta charset=\"UTF-8\" />\n<title>Export Canvas</title>\n" +
+      "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js\" integrity=\"GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==\" crossorigin=\"anonymous\" referrerpolicy=\"no-referrer\"></" + "script>\n" +
+      "<style>body{font-family:system-ui,sans-serif;background:#f3f4f6;margin:0;padding:16px;}#page{background:#fff;padding:24px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.12);}button{margin-top:16px;padding:8px 12px;border-radius:6px;border:1px solid #0ea5e9;background:#38bdf8;color:#0b1120;cursor:pointer;font-size:14px;}button:hover{filter:brightness(1.05);}textarea{width:100%;box-sizing:border-box;}</style>\n" +
+      "</head>\n<body>\n" +
+      "<div id=\"page\">\n" + escapedHtml + "\n</div>\n" +
+      "<button id=\"savePdfBtn\">Enregistrer / sauvegarder en PDF</button>\n" +
+      "<script>\n" +
+      "document.getElementById('savePdfBtn').addEventListener('click',function(){\n" +
+      "  window.print();\n" +
+            "});\n" +
+      "</" + "script>\n" +
+      "</body>\n</html>";
+
+    const blob = new Blob([fullHtml], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    statusLine.textContent = "Export HTML téléchargé : " + filename;
+  });
+
+  // Export PDF direct
+  document.getElementById("btn-export-pdf").addEventListener("click", () => {
+    const now = new Date();
+    const filename = STORAGE_KEY_BASE + "_" + formatDateForKey(now) + ".pdf";
+    const element = document.getElementById("canvas-frame");
+    const opt = {
+      margin: 10,
+      filename: filename,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    };
+    html2pdf().set(opt).from(element).save();
+    statusLine.textContent = "Génération du PDF en cours…";
+  });
+</script>
+</body>
+</html>

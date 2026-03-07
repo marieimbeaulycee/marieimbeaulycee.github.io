@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur QR Code & Code-barres</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- JsBarcode -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            width: 95%;
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #1e4ed8;
+        }
+
+        .results {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .card {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .info-box {
+            margin-top: 40px;
+            background: #eef2ff;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Générateur de QR Code & Code-barres</h1>
+    <p class="subtitle">Transformez un texte ou une URL en information numérique scannable</p>
+
+    <div class="form-group">
+        <label>Texte ou URL :</label>
+        <textarea id="textInput" rows="3" placeholder="Exemple : https://mon-site.fr ou un texte quelconque..."></textarea>
+    </div>
+
+    <button onclick="generateCodes()">Générer</button>
+
+    <div class="results">
+        <div class="card">
+            <h3>QR Code</h3>
+            <div id="qrcode"></div>
+        </div>
+
+        <div class="card">
+            <h3>Code-barres</h3>
+            <svg id="barcode"></svg>
+        </div>
+    </div>
+
+    <div class="info-box">
+        <h3>Pourquoi utiliser le numérique ?</h3>
+        <ul>
+            <li>✔ Accès instantané à une information via smartphone</li>
+            <li>✔ Réduction des erreurs de saisie manuelle</li>
+            <li>✔ Gain de temps dans l'industrie et le commerce</li>
+            <li>✔ Possibilité de stocker beaucoup d'informations dans un petit espace</li>
+            <li>✔ Automatisation (caisses, inventaires, traçabilité)</li>
+        </ul>
+        <p>
+            Comparez : taper une URL longue peut provoquer des erreurs.
+            Scanner un QR Code permet un accès immédiat et fiable.
+        </p>
+    </div>
+</div>
+
+<script>
+    function generateCodes() {
+        const text = document.getElementById("textInput").value;
+
+        if (!text) {
+            alert("Veuillez saisir un texte ou une URL.");
+            return;
+        }
+
+        document.getElementById("qrcode").innerHTML = "";
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: text,
+            width: 200,
+            height: 200
+        });
+
+        JsBarcode("#barcode", text, {
+            format: "CODE128",
+            width: 2,
+            height: 100,
+            displayValue: true
+        });
+    }
+</script>
+
+</body>
+</html>
