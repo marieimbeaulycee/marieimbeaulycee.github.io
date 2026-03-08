@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -120,8 +120,8 @@
     <p class="subtitle">Transformez un texte ou une URL en information numérique scannable</p>
 
     <div class="form-group">
-        <label>Texte ou URL :</label>
-        <textarea id="textInput" rows="3" placeholder="Exemple : https://mon-site.fr ou un texte quelconque..."></textarea>
+        <label>Texte ou URL : ( il ne faut pas oublier de mettre le ".mp3" à la fin )</label>
+        <textarea id="textInput" rows="3" placeholder="">marieimbeaulycee.github.io/mp3/</textarea>
     </div>
 
     <button onclick="generateCodes()">Générer</button>
@@ -132,10 +132,7 @@
             <div id="qrcode"></div>
         </div>
 
-        <div class="card">
-            <h3>Code-barres</h3>
-            <svg id="barcode"></svg>
-        </div>
+        
     </div>
 
     <div class="info-box">
