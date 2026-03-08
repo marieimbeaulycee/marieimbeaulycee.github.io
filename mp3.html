@@ -92,7 +92,7 @@
         </div>
         
         <div id="noFiles" class="no-files" style="display: none;">
-            Aucun fichier MP3 trouvé dans le dossier ./mp3
+            Aucun fichier MP3 trouvé dans le dossier ./
         </div>
     </div>
 
@@ -120,7 +120,7 @@
             noFilesElement.style.display = 'none';
             
             fileListElement.innerHTML = mp3Files.map(file => {
-                const filePath = `marieimbeaulycee.github.io/mp3/${file}`;
+                const filePath = `./${file}`;
                 const fileName = file.split('/').pop();
                 
                 return `
